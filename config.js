@@ -23,6 +23,10 @@ const LOJA = {
   // Veja o passo a passo no README.md. Deixe "" para usar a lista PRODUTOS abaixo.
   planilhaEstoque: "",
 
+  // URL do script da planilha que dá baixa no estoque a cada pedido.
+  // Veja o passo a passo no README.md. Deixe "" para não baixar automaticamente.
+  scriptPedidos: "",
+
   // Chave Pix mostrada para o cliente quando escolher Pix.
   chavePix: "sua-chave-pix@exemplo.com",
 };

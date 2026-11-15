@@ -289,8 +289,29 @@
   }
 
   // ---------- Enviar pedido ----------
-  form.addEventListener("submit", (e) => {
+  // Envia o pedido para o script da planilha, que confere e baixa o estoque.
+  // Retorna { ok, numero } | { ok:false, faltando:[...] } | null (script fora do ar)
+  async function baixarEstoque(dados) {
+    const url = (LOJA.scriptPedidos || "").trim();
+    if (!url) return null;
+    try {
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, // evita preflight de CORS no Google
+        body: JSON.stringify(dados),
+      });
+      const r = await resp.json();
+      return r.ok || r.faltando ? r : null;
+    } catch (e) {
+      console.warn("Falha ao baixar o estoque:", e);
+      return null;
+    }
+  }
+
+  let enviando = false;
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (enviando) return;
     const erro = $("#erro");
     erro.textContent = "";
     const d = Object.fromEntries(new FormData(form));
@@ -319,8 +340,44 @@
       troco = `Troco para ${brl(valor)} (troco: ${brl(valor - total)})`;
     }
 
+    const enderecoCompleto = entrega
+      ? [d.endereco.trim(), d.referencia.trim(), localizacao ? linkMapa() : ""].filter(Boolean).join(" | ")
+      : "";
+
+    const botao = form.querySelector(".btn-enviar");
+    const textoBotao = botao.textContent;
+    enviando = true;
+    botao.disabled = true;
+    botao.textContent = "Confirmando estoque...";
+    const r = await baixarEstoque({
+      cliente: d.nome.trim(),
+      telefone: d.telefone.trim(),
+      itens: itens.map(({ p, q }) => ({ produto: p.nome, quantidade: q })),
+      total,
+      pagamento: d.pagamento,
+      tipo: entrega ? "Entrega" : "Retirada",
+      endereco: enderecoCompleto,
+    });
+    enviando = false;
+    botao.disabled = false;
+    botao.textContent = textoBotao;
+
+    if (r && !r.ok) {
+      // Estoque mudou desde que a página abriu: atualiza e avisa o cliente
+      for (const f of r.faltando) {
+        const p = produtos.find((x) => x.nome === f.produto);
+        if (p) p.estoque = f.disponivel;
+      }
+      definirProdutos(produtos);
+      renderLista();
+      renderCarrinho();
+      return falha("Desculpe, o estoque mudou: " + r.faltando
+        .map((f) => f.disponivel > 0 ? `${f.produto} (só ${f.disponivel})` : `${f.produto} (esgotado)`)
+        .join(", ") + ". Ajustamos seu carrinho, confira e envie de novo.");
+    }
+
     const linhas = [
-      `*NOVO PEDIDO — ${LOJA.nome}*`,
+      r ? `*NOVO PEDIDO Nº ${r.numero} — ${LOJA.nome}*` : `*NOVO PEDIDO — ${LOJA.nome}*`,
       "",
       `*Cliente:* ${d.nome.trim()}`,
       `*Telefone:* ${d.telefone.trim()}`,
@@ -340,6 +397,7 @@
       entrega && d.referencia.trim() ? `Referência: ${d.referencia.trim()}` : null,
       entrega && localizacao ? `Localização: ${linkMapa()}` : null,
       d.obs.trim() ? `\n*Obs.:* ${d.obs.trim()}` : null,
+      LOJA.scriptPedidos && !r ? "\n⚠️ Estoque não foi baixado automaticamente." : null,
     ].filter((l) => l !== null);
 
     const url = `https://wa.me/${LOJA.whatsapp}?text=${encodeURIComponent(linhas.join("\n"))}`;

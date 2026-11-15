@@ -48,8 +48,42 @@ Depois de editar a planilha, o Google pode levar **até uns 5 minutos** para
 mostrar a mudança no site. Se a planilha não puder ser lida, o site usa a lista
 `PRODUTOS` do `config.js` como reserva.
 
-> O estoque não diminui sozinho quando chega um pedido: ao separar o pedido,
-> baixe a quantidade na planilha.
+## Baixa automática do estoque a cada pedido
+
+Com isso, quando o cliente envia o pedido, o estoque da planilha diminui
+sozinho e o pedido fica registrado numa aba **Pedidos** (com número, cliente,
+itens, total, pagamento e endereço).
+
+1. Na sua planilha de estoque: **Extensões → Apps Script**.
+2. Apague o que estiver lá, cole todo o conteúdo do arquivo
+   `apps-script/Codigo.gs` e clique em **Salvar** (💾).
+3. Clique em **Implantar → Nova implantação**. Na engrenagem, escolha **App da Web**:
+   - **Executar como:** Eu
+   - **Quem pode acessar:** Qualquer pessoa
+4. Clique em **Implantar** e autorize o acesso com sua conta do Google. Se aparecer
+   "O Google não verificou este app", clique em **Avançado → Acessar (não seguro)**.
+   O script é seu e só mexe nesta planilha.
+5. Copie a **URL do app da Web** (termina em `/exec`) e cole no `config.js`:
+
+   ```js
+   scriptPedidos: "https://script.google.com/macros/s/.../exec",
+   ```
+
+**Como funciona:**
+- Antes de abrir o WhatsApp, o site confere o estoque **real** na planilha. Se
+  alguém comprou o último item segundos antes, o cliente recebe um aviso e o
+  carrinho é ajustado. Nada é vendido sem estoque.
+- A mensagem no WhatsApp chega com o **número do pedido** (ex.: Nº 42), o mesmo da aba Pedidos.
+- **Cancelar um pedido** (cliente desistiu, não confirmou no WhatsApp etc.):
+  na aba **Pedidos**, clique na linha do pedido e use o menu
+  **🍺 Pedidos → Cancelar pedido selecionado**. Os itens voltam para o estoque.
+  (Se o menu não aparecer, recarregue a planilha.)
+- Se o script estiver fora do ar, o pedido **não é perdido**: vai pelo WhatsApp
+  com o aviso "⚠️ Estoque não foi baixado automaticamente", e você baixa na mão.
+- Se você **mudar o código** do script, publique de novo em
+  **Implantar → Gerenciar implantações → ✏️ → Versão: Nova versão**.
+- Não renomeie produtos na planilha enquanto houver pedidos abertos: o
+  cancelamento devolve o estoque procurando pelo nome.
 
 ## Como colocar no ar (grátis)
 
@@ -65,3 +99,4 @@ Para testar no computador, é só abrir o `index.html` no navegador.
 - `app.js`: carrinho, validações e montagem da mensagem do WhatsApp
 - `config.js`: dados da loja e estoque (**o único arquivo que você precisa editar**)
 - `planilha-modelo.csv`: modelo para importar no Google Planilhas
+- `apps-script/Codigo.gs`: script que dá baixa no estoque e registra os pedidos
