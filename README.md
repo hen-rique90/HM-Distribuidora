@@ -27,10 +27,12 @@ O site lê a planilha toda vez que um cliente abre a página.
 2. **Arquivo → Importar → Fazer upload** e envie o arquivo `planilha-modelo.csv`
    deste projeto (escolha "Substituir planilha"). Ou digite as colunas na mão:
 
-   | produto | categoria | preco | estoque |
-   |---|---|---|---|
-   | Brahma lata 350ml | Cervejas | 4,50 | 120 |
-   | Espetinho de carne | Espetinhos | 8,00 | 40 |
+   | produto | tamanho | categoria | preco | estoque |
+   |---|---|---|---|---|
+   | Brahma lata | 350ml | Cervejas | 4,50 | 120 |
+   | Espetinho de carne | | Espetinhos | 8,00 | 40 |
+
+   - **tamanho** é opcional. No site aparece junto do nome ("Brahma lata 350ml").
 
    - **categoria** precisa ser uma destas: `Cervejas`, `Refrigerantes`, `Cachaças`,
      `Doses` ou `Espetinhos`. Linhas com outra categoria são ignoradas.
@@ -56,7 +58,8 @@ itens, total, pagamento e endereço).
 
 1. Na sua planilha de estoque: **Extensões → Apps Script**.
 2. Apague o que estiver lá, cole todo o conteúdo do arquivo
-   `apps-script/Codigo.gs` e clique em **Salvar** (💾).
+   `apps-script/Codigo.gs`. Na linha `const SENHA_ADMIN = "troque-esta-senha";`
+   coloque **a senha da sua área de estoque** e clique em **Salvar** (💾).
 3. Clique em **Implantar → Nova implantação**. Na engrenagem, escolha **App da Web**:
    - **Executar como:** Eu
    - **Quem pode acessar:** Qualquer pessoa
@@ -85,6 +88,30 @@ itens, total, pagamento e endereço).
 - Não renomeie produtos na planilha enquanto houver pedidos abertos: o
   cancelamento devolve o estoque procurando pelo nome.
 
+## Área de estoque (admin.html)
+
+Página para você alimentar o estoque pelo celular, sem abrir a planilha.
+Ela precisa do script acima configurado.
+
+Acesse `https://<seu-site>/admin.html` e entre com a `SENHA_ADMIN` do script.
+Salve o link na tela inicial do celular para abrir rápido.
+
+- **➕ Entrada de estoque**: escolha o produto, informe quanto chegou e, se quiser,
+  o novo preço. A quantidade é **somada** ao estoque.
+- **🆕 Novo produto**: nome, tamanho, categoria, preço e quantidade inicial.
+  O produto aparece na loja na hora.
+- **Estoque atual**: lista com quantidade de cada produto (laranja = 5 ou menos,
+  vermelho = zerado). O botão **+ Entrada** já abre o formulário com o produto escolhido.
+- Toda entrada e cadastro fica registrado na aba **Entradas** da planilha
+  (data, produto, quantidade, preço).
+
+Com o script configurado, a loja também passa a ler o estoque direto por ele,
+**em tempo real** (sem a demora de ~5 minutos da planilha publicada).
+
+> Se você já tinha publicado o script antes, depois de colar o código novo vá em
+> **Implantar → Gerenciar implantações → ✏️ → Versão: Nova versão → Implantar**.
+> A URL continua a mesma.
+
 ## Como colocar no ar (grátis)
 
 No GitHub: **Settings → Pages → Source: Deploy from a branch → branch `main`, pasta `/ (root)`**.
@@ -99,4 +126,5 @@ Para testar no computador, é só abrir o `index.html` no navegador.
 - `app.js`: carrinho, validações e montagem da mensagem do WhatsApp
 - `config.js`: dados da loja e estoque (**o único arquivo que você precisa editar**)
 - `planilha-modelo.csv`: modelo para importar no Google Planilhas
+- `admin.html` / `admin.js`: área de estoque (entrada e cadastro de produtos)
 - `apps-script/Codigo.gs`: script que dá baixa no estoque e registra os pedidos

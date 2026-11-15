@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Estoque — Admin</title>
+  <meta name="theme-color" content="#b91c1c">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin">
+  <header class="topo">
+    <div class="topo-inner">
+      <div>
+        <h1>📦 Estoque</h1>
+        <p class="slogan" id="nome-loja"></p>
+      </div>
+      <button id="btn-sair" class="btn-carrinho" hidden>Sair</button>
+    </div>
+  </header>
+
+  <main class="conteudo">
+    <!-- Sem script configurado -->
+    <div id="sem-script" class="aviso" hidden>
+      Para usar esta página, configure o <strong>scriptPedidos</strong> no <code>config.js</code>
+      (veja o README).
+    </div>
+
+    <!-- Login -->
+    <form id="form-login" class="cartao-form" hidden>
+      <h2>Entrar</h2>
+      <label>Senha
+        <input name="senha" type="password" required autocomplete="current-password">
+      </label>
+      <p class="erro" role="alert"></p>
+      <button class="btn-enviar btn-principal" type="submit">Entrar</button>
+    </form>
+
+    <div id="painel-admin" hidden>
+      <div class="abas" role="tablist">
+        <button type="button" class="aba ativa" data-aba="entrada">➕ Entrada de estoque</button>
+        <button type="button" class="aba" data-aba="novo">🆕 Novo produto</button>
+      </div>
+
+      <!-- Entrada de estoque -->
+      <form id="form-entrada" class="cartao-form" data-painel="entrada">
+        <label>Produto
+          <select name="produto" required></select>
+        </label>
+        <p class="dica" id="info-produto"></p>
+        <div class="duas-col">
+          <label>Quantidade que chegou
+            <input name="quantidade" type="number" min="1" step="1" inputmode="numeric" required placeholder="Ex.: 24">
+          </label>
+          <label>Novo preço (opcional)
+            <input name="preco" inputmode="decimal" placeholder="Manter o atual">
+          </label>
+        </div>
+        <p class="erro" role="alert"></p>
+        <button class="btn-enviar btn-principal" type="submit">Somar ao estoque</button>
+      </form>
+
+      <!-- Novo produto -->
+      <form id="form-novo" class="cartao-form" data-painel="novo" hidden>
+        <label>Nome do produto
+          <input name="nome" required placeholder="Ex.: Heineken long neck">
+        </label>
+        <div class="duas-col">
+          <label>Tamanho
+            <input name="tamanho" placeholder="Ex.: 330ml, 2L, 600ml">
+          </label>
+          <label>Categoria
+            <select name="categoria" required></select>
+          </label>
+        </div>
+        <div class="duas-col">
+          <label>Preço de venda (R$)
+            <input name="preco" inputmode="decimal" required placeholder="Ex.: 8,50">
+          </label>
+          <label>Quantidade inicial
+            <input name="estoque" type="number" min="0" step="1" inputmode="numeric" required placeholder="Ex.: 48">
+          </label>
+        </div>
+        <p class="erro" role="alert"></p>
+        <button class="btn-enviar btn-principal" type="submit">Cadastrar produto</button>
+      </form>
+
+      <p id="sucesso" class="sucesso" role="status"></p>
+
+      <h2 class="titulo-lista">Estoque atual</h2>
+      <input id="busca" class="busca" type="search" placeholder="Buscar produto..." aria-label="Buscar produto">
+      <div id="tabela"></div>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

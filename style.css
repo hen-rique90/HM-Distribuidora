@@ -97,3 +97,30 @@ input:focus, textarea:focus { outline: 2px solid var(--cor); outline-offset: 0; 
 .erro { color: var(--cor); font-weight: 600; min-height: 1em; }
 .btn-enviar { width: 100%; padding: 15px; background: #25d366; color: #fff; font-weight: 700; font-size: 1.05rem; border: 0; border-radius: var(--raio); cursor: pointer; margin-bottom: 20px; }
 .btn-enviar:hover { filter: brightness(.95); }
+
+/* ---------- Admin ---------- */
+.admin { padding-bottom: 24px; }
+.cartao-form { background: #fff; border: 1px solid var(--borda); border-radius: var(--raio); padding: 14px; margin-bottom: 12px; }
+.cartao-form h2 { margin: 0 0 4px; font-size: 1.15rem; }
+.cartao-form select, label select { display: block; width: 100%; margin-top: 4px; padding: 10px 12px; border: 1px solid var(--borda); border-radius: 8px; background: #fff; font: inherit; }
+.btn-principal { background: var(--cor); margin: 8px 0 0; }
+.btn-principal:disabled { opacity: .6; cursor: wait; }
+.duas-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+@media (max-width: 420px) { .duas-col { grid-template-columns: 1fr; } }
+.abas { display: flex; gap: 6px; margin-bottom: 10px; }
+.aba { flex: 1; padding: 10px; border: 1px solid var(--borda); background: #fff; border-radius: var(--raio); font-weight: 600; cursor: pointer; color: var(--texto); }
+.aba.ativa { background: var(--cor); border-color: var(--cor); color: #fff; }
+.sucesso { color: var(--ok); font-weight: 600; min-height: 1em; margin: 4px 0; }
+.titulo-lista { font-size: 1.1rem; margin: 18px 0 8px; }
+.tabela-estoque { display: flex; flex-direction: column; gap: 6px; }
+.linha-estoque { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; background: #fff; border: 1px solid var(--borda); border-radius: var(--raio); padding: 10px 12px; }
+.linha-estoque small { display: block; color: var(--suave); font-size: .8rem; margin-top: 2px; }
+.linha-estoque.baixo .qtd-estoque { color: #c2410c; }
+.linha-estoque.zerado { opacity: .65; }
+.linha-estoque.zerado .qtd-estoque { color: var(--cor); }
+.qtd-estoque { font-weight: 700; font-size: 1.15rem; text-align: right; }
+.qtd-estoque small { display: inline; margin-left: 2px; }
+.tag { display: inline-block; background: #f3efeb; border-radius: 6px; padding: 1px 6px; font-size: .78rem; color: var(--suave); }
+.btn-mini { padding: 7px 10px; border: 1px solid var(--cor); color: var(--cor); background: #fff; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.cartao-form .erro:empty { display: none; }
+.cartao-form .btn-principal { margin-top: 14px; }

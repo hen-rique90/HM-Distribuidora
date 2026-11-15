@@ -60,38 +60,58 @@
     return CATEGORIAS.find((c) => normalizar(c.id) === v || normalizar(c.nome) === v || normalizar(c.nome).startsWith(v));
   }
 
-  function produtosDaPlanilha(texto) {
-    const [cab, ...linhas] = lerCSV(texto);
-    if (!cab) return [];
-    const col = (...nomes) => cab.findIndex((h) => nomes.includes(normalizar(h)));
-    const iNome = col("produto", "nome"), iCat = col("categoria"), iPreco = col("preco", "valor"), iEst = col("estoque", "quantidade", "qtd");
-    if ([iNome, iCat, iPreco, iEst].includes(-1)) throw new Error("Colunas esperadas: produto, categoria, preco, estoque");
+  // Converte linhas { produto, tamanho, categoria, preco, estoque } em produtos do site
+  function montarProdutos(linhas) {
     const ids = new Set();
     return linhas.map((l) => {
-      const nome = (l[iNome] || "").trim();
-      const cat = acharCategoria(l[iCat]);
+      const nome = [String(l.produto || "").trim(), String(l.tamanho || "").trim()].filter(Boolean).join(" ");
+      const cat = acharCategoria(l.categoria);
       if (!nome || !cat) return null;
       let id = normalizar(nome).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
       while (ids.has(id)) id += "-2";
       ids.add(id);
-      return { id, nome, categoria: cat.id, preco: numero(l[iPreco]), estoque: Math.max(0, Math.floor(numero(l[iEst]))) };
+      return { id, nome, categoria: cat.id, preco: numero(l.preco), estoque: Math.max(0, Math.floor(numero(l.estoque))) };
     }).filter(Boolean);
   }
 
+  function produtosDaPlanilha(texto) {
+    const [cab, ...linhas] = lerCSV(texto);
+    if (!cab) return [];
+    const col = (...nomes) => cab.findIndex((h) => nomes.includes(normalizar(h)));
+    const iNome = col("produto", "nome"), iTam = col("tamanho"), iCat = col("categoria"), iPreco = col("preco", "valor"), iEst = col("estoque", "quantidade", "qtd");
+    if ([iNome, iCat, iPreco, iEst].includes(-1)) throw new Error("Colunas esperadas: produto, categoria, preco, estoque");
+    return montarProdutos(linhas.map((l) => ({
+      produto: l[iNome], tamanho: iTam >= 0 ? l[iTam] : "", categoria: l[iCat], preco: l[iPreco], estoque: l[iEst],
+    })));
+  }
+
+  // Ordem: script da planilha (estoque em tempo real) → CSV publicado → lista do config.js
   async function carregarProdutos() {
-    const url = (LOJA.planilhaEstoque || "").trim();
-    if (!url) return PRODUTOS;
-    try {
-      const sep = url.includes("?") ? "&" : "?";
-      const resp = await fetch(`${url}${sep}t=${Date.now()}`, { cache: "no-store" });
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const lista = produtosDaPlanilha(await resp.text());
-      if (!lista.length) throw new Error("planilha vazia");
-      return lista;
-    } catch (e) {
-      console.warn("Não foi possível ler a planilha, usando a lista do config.js:", e);
-      return PRODUTOS;
+    const script = (LOJA.scriptPedidos || "").trim();
+    if (script) {
+      try {
+        const resp = await fetch(`${script}?acao=listar&t=${Date.now()}`);
+        const r = await resp.json();
+        // O script devolve "produto" já com o tamanho; separa para não duplicar
+        const lista = montarProdutos((r.produtos || []).map((p) => ({ ...p, tamanho: "" })));
+        if (r.ok && lista.length) return lista;
+      } catch (e) {
+        console.warn("Não foi possível ler o estoque pelo script:", e);
+      }
     }
+    const url = (LOJA.planilhaEstoque || "").trim();
+    if (url) {
+      try {
+        const sep = url.includes("?") ? "&" : "?";
+        const resp = await fetch(`${url}${sep}t=${Date.now()}`, { cache: "no-store" });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const lista = produtosDaPlanilha(await resp.text());
+        if (lista.length) return lista;
+      } catch (e) {
+        console.warn("Não foi possível ler a planilha:", e);
+      }
+    }
+    return PRODUTOS;
   }
 
   function horarioNoturno() {
