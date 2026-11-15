@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HM Distribuidora</title>
+  <meta name="description" content="Cervejas, refrigerantes, cachaças, doses e espetinhos com entrega. Faça seu pedido pelo site.">
+  <meta name="theme-color" content="#b91c1c">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-inner">
+      <div>
+        <h1 id="nome-loja">HM Distribuidora</h1>
+        <p id="slogan" class="slogan"></p>
+      </div>
+      <button id="btn-carrinho" class="btn-carrinho" aria-label="Abrir carrinho">
+        🛒 <span id="qtd-carrinho">0</span>
+      </button>
+    </div>
+    <nav id="categorias" class="categorias" aria-label="Categorias"></nav>
+  </header>
+
+  <main class="conteudo">
+    <div id="aviso-noite" class="aviso" hidden></div>
+    <input id="busca" class="busca" type="search" placeholder="Buscar produto..." aria-label="Buscar produto">
+    <div id="lista"></div>
+  </main>
+
+  <!-- Barra fixa de total no celular -->
+  <button id="barra-total" class="barra-total" hidden>
+    <span>Ver pedido</span><strong id="barra-valor">R$ 0,00</strong>
+  </button>
+
+  <!-- Carrinho / finalizar pedido -->
+  <div id="painel" class="painel" hidden>
+    <div class="painel-fundo" data-fechar></div>
+    <aside class="painel-caixa" role="dialog" aria-modal="true" aria-labelledby="titulo-pedido">
+      <div class="painel-cab">
+        <h2 id="titulo-pedido">Seu pedido</h2>
+        <button class="fechar" data-fechar aria-label="Fechar">✕</button>
+      </div>
+
+      <div id="itens-carrinho" class="itens-carrinho"></div>
+
+      <form id="form-pedido" novalidate>
+        <fieldset>
+          <legend>Seus dados</legend>
+          <label>Nome
+            <input name="nome" required autocomplete="name" placeholder="Seu nome">
+          </label>
+          <label>Telefone / WhatsApp
+            <input name="telefone" type="tel" required autocomplete="tel" placeholder="(00) 00000-0000">
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Entrega</legend>
+          <div class="opcoes">
+            <label class="opcao"><input type="radio" name="tipo" value="entrega" checked> 🛵 Entrega</label>
+            <label class="opcao"><input type="radio" name="tipo" value="retirada"> 🏪 Retirar na loja</label>
+          </div>
+
+          <div id="campos-endereco">
+            <button type="button" id="btn-localizacao" class="btn-sec">📍 Usar minha localização atual</button>
+            <p id="status-localizacao" class="dica"></p>
+            <label>Endereço
+              <input name="endereco" autocomplete="street-address" placeholder="Rua, número, bairro">
+            </label>
+            <label>Complemento / ponto de referência
+              <input name="referencia" placeholder="Ex.: casa azul, ao lado da padaria">
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Forma de pagamento</legend>
+          <div class="opcoes">
+            <label class="opcao"><input type="radio" name="pagamento" value="Pix" required> Pix</label>
+            <label class="opcao"><input type="radio" name="pagamento" value="Dinheiro"> Dinheiro</label>
+            <label class="opcao"><input type="radio" name="pagamento" value="Cartão de débito"> Cartão de débito</label>
+            <label class="opcao"><input type="radio" name="pagamento" value="Cartão de crédito"> Cartão de crédito</label>
+          </div>
+          <label id="campo-troco" hidden>Troco para quanto?
+            <input name="troco" inputmode="decimal" placeholder="Ex.: 50 (deixe vazio se não precisar)">
+          </label>
+          <p id="info-pix" class="dica" hidden></p>
+        </fieldset>
+
+        <label>Observações
+          <textarea name="obs" rows="2" placeholder="Ex.: bem gelada, espetinho bem passado..."></textarea>
+        </label>
+
+        <div class="resumo">
+          <div><span>Subtotal</span><span id="subtotal">R$ 0,00</span></div>
+          <div id="linha-taxa"><span>Taxa de entrega</span><span id="taxa">R$ 0,00</span></div>
+          <div class="total"><span>Total</span><span id="total">R$ 0,00</span></div>
+        </div>
+
+        <p id="erro" class="erro" role="alert"></p>
+        <button type="submit" class="btn-enviar">Enviar pedido pelo WhatsApp</button>
+      </form>
+    </aside>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

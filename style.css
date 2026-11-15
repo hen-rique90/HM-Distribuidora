@@ -1,0 +1,99 @@
+:root {
+  --cor: #b91c1c;
+  --cor-escura: #7f1d1d;
+  --fundo: #f6f4f1;
+  --cartao: #ffffff;
+  --texto: #1f1a17;
+  --suave: #6b6460;
+  --borda: #e6e1dc;
+  --ok: #15803d;
+  --raio: 12px;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--fundo);
+  color: var(--texto);
+  padding-bottom: 80px;
+}
+
+button, input, textarea { font: inherit; }
+
+/* Topo */
+.topo { background: var(--cor); color: #fff; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.topo-inner { max-width: 960px; margin: 0 auto; padding: 14px 16px 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.topo h1 { margin: 0; font-size: 1.35rem; }
+.slogan { margin: 2px 0 0; font-size: .85rem; opacity: .9; }
+.btn-carrinho { background: #fff; color: var(--cor); border: 0; border-radius: 999px; padding: 8px 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+
+.categorias { max-width: 960px; margin: 0 auto; display: flex; gap: 8px; overflow-x: auto; padding: 6px 16px 12px; scrollbar-width: none; }
+.categorias::-webkit-scrollbar { display: none; }
+.categorias a { color: #fff; text-decoration: none; background: rgba(255,255,255,.15); padding: 6px 12px; border-radius: 999px; font-size: .9rem; white-space: nowrap; }
+.categorias a:hover { background: rgba(255,255,255,.28); }
+
+/* Conteúdo */
+.conteudo { max-width: 960px; margin: 0 auto; padding: 16px; }
+.busca { width: 100%; padding: 12px 14px; border: 1px solid var(--borda); border-radius: var(--raio); background: #fff; margin-bottom: 8px; }
+.aviso { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; padding: 10px 14px; border-radius: var(--raio); margin-bottom: 12px; font-size: .92rem; }
+
+.secao h2 { font-size: 1.1rem; margin: 22px 0 10px; scroll-margin-top: 130px; }
+.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+
+.produto { background: var(--cartao); border: 1px solid var(--borda); border-radius: var(--raio); padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.produto.indisponivel { opacity: .55; }
+.produto h3 { margin: 0; font-size: .98rem; font-weight: 600; }
+.produto .preco { font-weight: 700; color: var(--cor); font-size: 1.05rem; }
+.estoque { font-size: .8rem; color: var(--suave); }
+.estoque.pouco { color: #c2410c; font-weight: 600; }
+.estoque.zero { color: var(--suave); font-weight: 600; }
+.produto-rodape { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 4px; }
+
+.qtd { display: inline-flex; align-items: center; gap: 4px; }
+.qtd button { width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--cor); color: #fff; font-size: 1.1rem; font-weight: 700; cursor: pointer; line-height: 1; }
+.qtd button:disabled { background: #d6d0cb; cursor: not-allowed; }
+.qtd span { min-width: 24px; text-align: center; font-weight: 700; }
+
+/* Barra total */
+.barra-total { position: fixed; left: 16px; right: 16px; bottom: 16px; max-width: 928px; margin: 0 auto; background: var(--ok); color: #fff; border: 0; border-radius: var(--raio); padding: 14px 18px; display: flex; justify-content: space-between; font-size: 1rem; cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,.2); z-index: 9; }
+.barra-total[hidden] { display: none; }
+
+/* Painel */
+.painel { position: fixed; inset: 0; z-index: 20; }
+.painel[hidden] { display: none; }
+.painel-fundo { position: absolute; inset: 0; background: rgba(0,0,0,.45); }
+.painel-caixa { position: absolute; right: 0; top: 0; bottom: 0; width: min(460px, 100%); background: var(--fundo); overflow-y: auto; padding: 16px; }
+.painel-cab { display: flex; justify-content: space-between; align-items: center; }
+.painel-cab h2 { margin: 0; }
+.fechar { background: none; border: 0; font-size: 1.4rem; cursor: pointer; padding: 6px; }
+
+.itens-carrinho { margin: 12px 0; }
+.item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--borda); border-radius: var(--raio); padding: 10px; margin-bottom: 6px; }
+.item-nome { font-size: .92rem; }
+.item-nome small { display: block; color: var(--suave); }
+.vazio { color: var(--suave); text-align: center; padding: 20px 0; }
+
+fieldset { border: 1px solid var(--borda); border-radius: var(--raio); background: #fff; margin: 0 0 12px; padding: 10px 12px 12px; }
+legend { font-weight: 700; padding: 0 4px; }
+label { display: block; font-size: .9rem; margin-top: 8px; }
+label input:not([type=radio]), label textarea { display: block; width: 100%; margin-top: 4px; padding: 10px 12px; border: 1px solid var(--borda); border-radius: 8px; background: #fff; }
+input:focus, textarea:focus { outline: 2px solid var(--cor); outline-offset: 0; border-color: transparent; }
+
+.opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.opcao { margin: 0; border: 1px solid var(--borda); border-radius: 8px; padding: 10px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.opcao:has(input:checked) { border-color: var(--cor); background: #fef2f2; font-weight: 600; }
+
+.btn-sec { margin-top: 10px; width: 100%; padding: 10px; border: 1px dashed var(--cor); background: #fff; color: var(--cor); border-radius: 8px; cursor: pointer; font-weight: 600; }
+.dica { font-size: .82rem; color: var(--suave); margin: 6px 0 0; word-break: break-word; }
+.dica a { color: var(--cor); }
+
+.resumo { background: #fff; border: 1px solid var(--borda); border-radius: var(--raio); padding: 10px 12px; margin-top: 12px; }
+.resumo div { display: flex; justify-content: space-between; padding: 3px 0; }
+.resumo .total { font-weight: 700; font-size: 1.1rem; border-top: 1px solid var(--borda); margin-top: 4px; padding-top: 8px; }
+
+.erro { color: var(--cor); font-weight: 600; min-height: 1em; }
+.btn-enviar { width: 100%; padding: 15px; background: #25d366; color: #fff; font-weight: 700; font-size: 1.05rem; border: 0; border-radius: var(--raio); cursor: pointer; margin-bottom: 20px; }
+.btn-enviar:hover { filter: brightness(.95); }
