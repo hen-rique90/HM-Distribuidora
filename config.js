@@ -19,15 +19,22 @@ const LOJA = {
   // Horário em que os espetinhos ficam disponíveis (formato 24h).
   espetinhos: { inicio: 18, fim: 23 },
 
+  // Link da planilha do Google com o estoque (publicada como CSV).
+  // Veja o passo a passo no README.md. Deixe "" para usar a lista PRODUTOS abaixo.
+  planilhaEstoque: "",
+
   // Chave Pix mostrada para o cliente quando escolher Pix.
   chavePix: "sua-chave-pix@exemplo.com",
 };
 
 // =====================================================================
 //  ESTOQUE
+//  Se "planilhaEstoque" estiver preenchido, os produtos vêm da planilha e a
+//  lista PRODUTOS abaixo só é usada se a planilha não puder ser lida.
 //  - estoque: quantidade disponível (0 = esgotado, aparece como "Esgotado")
 //  - categoria: precisa ser uma das CATEGORIAS abaixo
 //  - noturno: true = só pode ser pedido no horário dos espetinhos
+//    (todos da categoria espetinhos já são noturnos)
 // =====================================================================
 
 const CATEGORIAS = [
@@ -35,7 +42,7 @@ const CATEGORIAS = [
   { id: "refrigerantes", nome: "Refrigerantes", icone: "🥤" },
   { id: "cachacas", nome: "Cachaças", icone: "🥃" },
   { id: "doses", nome: "Doses (copo americano)", icone: "🥛" },
-  { id: "espetinhos", nome: "Espetinhos (à noite)", icone: "🍢" },
+  { id: "espetinhos", nome: "Espetinhos (à noite)", icone: "🍢", noturno: true },
 ];
 
 const PRODUTOS = [

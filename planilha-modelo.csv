@@ -1,0 +1,21 @@
+produto,categoria,preco,estoque
+Brahma lata 350ml,Cervejas,"4,50",120
+Skol lata 350ml,Cervejas,"4,50",96
+Heineken long neck 330ml,Cervejas,"8,00",48
+Original 600ml,Cervejas,"12,00",24
+Brahma litrão 1L,Cervejas,"11,00",0
+Coca-Cola 2L,Refrigerantes,"12,00",30
+Coca-Cola lata 350ml,Refrigerantes,"5,00",60
+Guaraná Antarctica 2L,Refrigerantes,"10,00",25
+Fanta Laranja 2L,Refrigerantes,"9,00",12
+Cachaça 51 965ml,Cachaças,"18,00",15
+Ypióca Prata 965ml,Cachaças,"22,00",10
+Velho Barreiro 910ml,Cachaças,"17,00",8
+Dose de 51,Doses,"3,00",100
+Dose de Ypióca,Doses,"4,00",100
+Dose de conhaque,Doses,"4,00",80
+Espetinho de carne,Espetinhos,"8,00",40
+Espetinho de frango,Espetinhos,"7,00",40
+Espetinho de linguiça,Espetinhos,"7,00",30
+Espetinho de queijo coalho,Espetinhos,"7,00",25
+Espetinho de coração,Espetinhos,"8,00",20

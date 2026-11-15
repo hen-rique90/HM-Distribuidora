@@ -9,13 +9,89 @@
   try { carrinho = JSON.parse(localStorage.getItem("hm-carrinho")) || {}; } catch (e) { carrinho = {}; }
   let localizacao = null; // { lat, lng }
 
-  const produtoPorId = Object.fromEntries(PRODUTOS.map((p) => [p.id, p]));
+  let produtos = [];
+  let produtoPorId = {};
 
-  // Remove do carrinho itens que não existem mais ou excedem o estoque
-  for (const id of Object.keys(carrinho)) {
-    const p = produtoPorId[id];
-    if (!p || p.estoque <= 0) delete carrinho[id];
-    else carrinho[id] = Math.min(carrinho[id], p.estoque);
+  function definirProdutos(lista) {
+    produtos = lista;
+    produtoPorId = Object.fromEntries(lista.map((p) => [p.id, p]));
+    // Remove do carrinho itens que não existem mais ou excedem o estoque
+    for (const id of Object.keys(carrinho)) {
+      const p = produtoPorId[id];
+      if (!p || p.estoque <= 0) delete carrinho[id];
+      else carrinho[id] = Math.min(carrinho[id], p.estoque);
+    }
+    salvar();
+  }
+
+  // ---------- Planilha do Google ----------
+  const normalizar = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+  // Lê CSV respeitando campos entre aspas (ex.: "4,50")
+  function lerCSV(texto) {
+    const linhas = [];
+    let linha = [], campo = "", aspas = false;
+    for (let i = 0; i < texto.length; i++) {
+      const c = texto[i];
+      if (aspas) {
+        if (c === '"' && texto[i + 1] === '"') { campo += '"'; i++; }
+        else if (c === '"') aspas = false;
+        else campo += c;
+      } else if (c === '"') aspas = true;
+      else if (c === ",") { linha.push(campo); campo = ""; }
+      else if (c === "\n" || c === "\r") {
+        if (c === "\r" && texto[i + 1] === "\n") i++;
+        linha.push(campo); linhas.push(linha); linha = []; campo = "";
+      } else campo += c;
+    }
+    if (campo || linha.length) { linha.push(campo); linhas.push(linha); }
+    return linhas.filter((l) => l.some((v) => v.trim()));
+  }
+
+  function numero(v) {
+    let t = String(v || "").replace(/[^\d,.-]/g, "");
+    if (t.includes(",")) t = t.replace(/\./g, "").replace(",", ".");
+    const n = parseFloat(t);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function acharCategoria(valor) {
+    const v = normalizar(valor);
+    return CATEGORIAS.find((c) => normalizar(c.id) === v || normalizar(c.nome) === v || normalizar(c.nome).startsWith(v));
+  }
+
+  function produtosDaPlanilha(texto) {
+    const [cab, ...linhas] = lerCSV(texto);
+    if (!cab) return [];
+    const col = (...nomes) => cab.findIndex((h) => nomes.includes(normalizar(h)));
+    const iNome = col("produto", "nome"), iCat = col("categoria"), iPreco = col("preco", "valor"), iEst = col("estoque", "quantidade", "qtd");
+    if ([iNome, iCat, iPreco, iEst].includes(-1)) throw new Error("Colunas esperadas: produto, categoria, preco, estoque");
+    const ids = new Set();
+    return linhas.map((l) => {
+      const nome = (l[iNome] || "").trim();
+      const cat = acharCategoria(l[iCat]);
+      if (!nome || !cat) return null;
+      let id = normalizar(nome).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      while (ids.has(id)) id += "-2";
+      ids.add(id);
+      return { id, nome, categoria: cat.id, preco: numero(l[iPreco]), estoque: Math.max(0, Math.floor(numero(l[iEst]))) };
+    }).filter(Boolean);
+  }
+
+  async function carregarProdutos() {
+    const url = (LOJA.planilhaEstoque || "").trim();
+    if (!url) return PRODUTOS;
+    try {
+      const sep = url.includes("?") ? "&" : "?";
+      const resp = await fetch(`${url}${sep}t=${Date.now()}`, { cache: "no-store" });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const lista = produtosDaPlanilha(await resp.text());
+      if (!lista.length) throw new Error("planilha vazia");
+      return lista;
+    } catch (e) {
+      console.warn("Não foi possível ler a planilha, usando a lista do config.js:", e);
+      return PRODUTOS;
+    }
   }
 
   function horarioNoturno() {
@@ -24,8 +100,12 @@
     return inicio <= fim ? h >= inicio && h < fim : h >= inicio || h < fim;
   }
 
+  function noturno(p) {
+    return !!(p.noturno || CATEGORIAS.find((c) => c.id === p.categoria)?.noturno);
+  }
+
   function disponivel(p) {
-    return p.estoque > 0 && (!p.noturno || horarioNoturno());
+    return p.estoque > 0 && (!noturno(p) || horarioNoturno());
   }
 
   function salvar() {
@@ -53,7 +133,7 @@
   // ---------- Lista de produtos ----------
   function textoEstoque(p) {
     if (p.estoque <= 0) return `<span class="estoque zero">Esgotado</span>`;
-    if (p.noturno && !horarioNoturno()) return `<span class="estoque zero">Disponível a partir das ${LOJA.espetinhos.inicio}h</span>`;
+    if (noturno(p) && !horarioNoturno()) return `<span class="estoque zero">Disponível a partir das ${LOJA.espetinhos.inicio}h</span>`;
     if (p.estoque <= 5) return `<span class="estoque pouco">Últimas ${p.estoque} unidades</span>`;
     return `<span class="estoque">${p.estoque} em estoque</span>`;
   }
@@ -71,7 +151,7 @@
   function renderLista() {
     const termo = $("#busca").value.trim().toLowerCase();
     const html = CATEGORIAS.map((c) => {
-      const itens = PRODUTOS.filter((p) => p.categoria === c.id && p.nome.toLowerCase().includes(termo));
+      const itens = produtos.filter((p) => p.categoria === c.id && p.nome.toLowerCase().includes(termo));
       if (!itens.length) return "";
       return `<section class="secao" id="cat-${c.id}">
         <h2>${c.icone} ${escapar(c.nome)}</h2>
@@ -272,6 +352,10 @@
     $("#itens-carrinho").innerHTML = `<p class="vazio">✅ Pedido montado! Confirme o envio no WhatsApp.</p>`;
   });
 
-  renderLista();
-  renderCarrinho();
+  $("#lista").innerHTML = `<p class="vazio">Carregando estoque...</p>`;
+  carregarProdutos().then((lista) => {
+    definirProdutos(lista);
+    renderLista();
+    renderCarrinho();
+  });
 })();
