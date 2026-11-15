@@ -420,14 +420,20 @@
       LOJA.scriptPedidos && !r ? "\n⚠️ Estoque não foi baixado automaticamente." : null,
     ].filter((l) => l !== null);
 
-    const url = `https://wa.me/${LOJA.whatsapp}?text=${encodeURIComponent(linhas.join("\n"))}`;
-    window.open(url, "_blank") || (window.location.href = url);
+    const url = `https://wa.me/${(LOJA.whatsapp || "").replace(/\D/g, "")}?text=${encodeURIComponent(linhas.join("\n"))}`;
+    // Tenta abrir sozinho; se o navegador bloquear, o cliente usa o botão abaixo
+    try { window.open(url, "_blank", "noopener"); } catch (err) { /* bloqueado */ }
 
     carrinho = {};
     salvar();
     renderLista();
     renderCarrinho();
-    $("#itens-carrinho").innerHTML = `<p class="vazio">✅ Pedido montado! Confirme o envio no WhatsApp.</p>`;
+    $("#itens-carrinho").innerHTML = `<div class="pedido-ok">
+      <p>✅ ${r ? `Pedido <strong>Nº ${r.numero}</strong> registrado!` : "Pedido montado!"}<br>
+      Agora é só enviar a mensagem no WhatsApp.</p>
+      <a class="btn-enviar" href="${url}" target="_blank" rel="noopener">Abrir WhatsApp e enviar</a>
+    </div>`;
+    $("#itens-carrinho").scrollIntoView({ behavior: "smooth" });
   });
 
   $("#lista").innerHTML = `<p class="vazio">Carregando estoque...</p>`;

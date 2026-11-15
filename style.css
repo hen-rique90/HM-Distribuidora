@@ -124,3 +124,6 @@ input:focus, textarea:focus { outline: 2px solid var(--cor); outline-offset: 0; 
 .btn-mini { padding: 7px 10px; border: 1px solid var(--cor); color: var(--cor); background: #fff; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .cartao-form .erro:empty { display: none; }
 .cartao-form .btn-principal { margin-top: 14px; }
+.pedido-ok { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--raio); padding: 14px; text-align: center; }
+.pedido-ok p { margin: 0 0 12px; }
+.pedido-ok .btn-enviar { display: block; text-decoration: none; margin: 0; }
